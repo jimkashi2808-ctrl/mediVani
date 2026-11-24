@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MediVaani</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body data-speaker="patient" data-screen="login">
+    <svg
+      width="0"
+      height="0"
+      style="position: absolute"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <!-- MediVaani logo: two speech bubbles (a conversation). Left bubble has a voice wave, right bubble has a medical cross. -->
+      <symbol id="mv-logo" viewBox="0 0 48 48">
+        <path
+          d="M4 8a6 6 0 0 1 6-6h18a6 6 0 0 1 6 6v12a6 6 0 0 1-6 6H16l-8 7v-7a6 6 0 0 1-4-5.6z"
+          fill="#0f766e"
+        />
+        <g fill="#fff">
+          <rect x="10" y="11" width="3" height="8" rx="1.5" />
+          <rect x="15.5" y="7" width="3" height="16" rx="1.5" />
+          <rect x="21" y="10" width="3" height="10" rx="1.5" />
+          <rect x="26.5" y="12" width="3" height="6" rx="1.5" />
+        </g>
+        <path
+          d="M24 22h14a6 6 0 0 1 6 6v8a6 6 0 0 1-4 5.6V47l-7-5H24a6 6 0 0 1-6-6v-8a6 6 0 0 1 6-6z"
+          fill="#2563eb"
+          stroke="#fff"
+          stroke-width="2"
+        />
+        <path d="M29.5 27h3v3.5H36v3h-3.5V37h-3v-3.5H26v-3h3.5z" fill="#fff" />
+      </symbol>
+    </svg>
+
+    <!-- Top bar (hidden on the login page) -->
+    <header class="topbar" id="topbar" hidden>
+      <button id="backBtn" class="bar-btn" type="button" aria-label="Go back">
+        ← Back
+      </button>
+      <span class="brand"
+        ><svg class="mark" aria-hidden="true"><use href="#mv-logo" /></svg
+        >MediVaani</span
+      >
+      <button id="signOutBtn" class="bar-btn" type="button">Sign out</button>
+    </header>
+
+    <!-- Progress: shown on the three "conversation" pages -->
+    <ol class="progress" id="progress" hidden aria-label="Progress">
+      <li>1 Who</li>
+      <li>2 Speak / write</li>
+      <li>3 Translation</li>
+    </ol>
+
+    <main class="wrap">
+      <!-- PAGE 1: login -->
+      <section class="screen active" id="screen-login">
+        <div class="card">
+          <div class="card-head hero">
+            <svg class="mark hero-mark" aria-hidden="true">
+              <use href="#mv-logo" />
+            </svg>
+            <h1>MediVaani</h1>
+            <p class="tagline">Understand each other, in your own language</p>
+          </div>
+          <form class="card-body" id="loginForm" autocomplete="off">
+            <label for="nameInput">Patient name</label>
+            <input
+              id="nameInput"
+              type="text"
+              maxlength="40"
+              placeholder="Type your name"
+            />
+            <p id="loginError" class="notice" hidden></p>
+            <button class="btn primary big" type="submit">Log in</button>
+            <p class="fine">
+              No password needed. Your name stays on this device and is only
+              used for the greeting.
+            </p>
+          </form>
+        </div>
+      </section>
+
+      <!-- PAGE 2: greeting + Start now -->
+      <section class="screen" id="screen-welcome">
+        <div class="card">
+          <div class="card-head"><h2 id="greeting">Hello!</h2></div>
+          <div class="card-body center">
+            <svg class="mark hero-mark" aria-hidden="true">
+              <use href="#mv-logo" />
+            </svg>
+            <p>
+              Welcome to <strong>MediVaani</strong>. Talk to your doctor in your
+              own language. We help you both understand each other.
+            </p>
+            <button id="startBtn" class="btn primary big" type="button">
+              Start now
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- PAGE 3: choose languages -->
+      <section class="screen" id="screen-languages">
+        <div class="card">
+          <div class="card-head"><h2>Choose the languages</h2></div>
+          <div class="card-body">
+            <label for="patientLang">Patient speaks</label>
+            <select id="patientLang"></select>
+            <label for="doctorLang">Doctor speaks</label>
+            <select id="doctorLang"></select>
+            <p id="sameLang" class="tip" hidden>
+              Both languages are the same, so nothing will be translated.
+            </p>
+            <button id="langNextBtn" class="btn primary big" type="button">
+              Continue
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- PAGE 4: how it works + who are you -->
+      <section class="screen" id="screen-who">
+        <div class="card">
+          <div class="card-head"><h2>How MediVaani works</h2></div>
+          <div class="card-body">
+            <ol class="steps" id="steps">
+              <li style="--i: 0">
+                <span class="num">1</span>
+                <div>
+                  <strong>Who are you?</strong>
+                  <p>Tap Patient or Doctor below.</p>
+                </div>
+              </li>
+              <li style="--i: 1">
+                <span class="num">2</span>
+                <div>
+                  <strong>Speak or write</strong>
+                  <p>
+                    Press the mic and talk, or type your message. You can fix
+                    mistakes before translating.
+                  </p>
+                </div>
+              </li>
+              <li style="--i: 2">
+                <span class="num">3</span>
+                <div>
+                  <strong>See the translation</strong>
+                  <p>
+                    A new page shows your words in both languages, with
+                    captions.
+                  </p>
+                </div>
+              </li>
+            </ol>
+            <h3>Step 1: Who are you?</h3>
+            <div class="role-row">
+              <button class="role patient" type="button" data-who="patient">
+                I am the Patient
+              </button>
+              <button class="role doctor" type="button" data-who="doctor">
+                I am the Doctor
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" id="logCard" hidden>
+          <div class="card-head"><h2>Conversation so far</h2></div>
+          <div class="card-body">
+            <p id="logNotice" class="notice" hidden></p>
+            <ol class="log" id="log"></ol>
+          </div>
+        </div>
+      </section>
+
+      <!-- PAGE 5: speak or write -->
+      <section class="screen" id="screen-input">
+        <div class="card">
+          <div class="card-head"><h2 id="inputTitle">Patient</h2></div>
+          <div class="card-body">
+            <div
+              class="tabs"
+              role="tablist"
+              aria-label="How do you want to give your message?"
+            >
+              <button
+                id="tabSpeak"
+                role="tab"
+                aria-selected="true"
+                type="button"
+              >
+                Speak
+              </button>
+              <button
+                id="tabWrite"
+                role="tab"
+                aria-selected="false"
+                type="button"
+              >
+                Write
+              </button>
+            </div>
+
+            <div id="speakPanel">
+              <div class="mic-row">
+                <button
+                  id="micBtn"
+                  class="mic"
+                  type="button"
+                  aria-pressed="false"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="28"
+                    height="28"
+                    aria-hidden="true"
+                  >
+                    <path
+                      fill="currentColor"
+                      d="M12 15a3.5 3.5 0 0 0 3.5-3.5V6a3.5 3.5 0 0 0-7 0v5.5A3.5 3.5 0 0 0 12 15Zm6-3.5a1 1 0 1 0-2 0 4 4 0 0 1-8 0 1 1 0 1 0-2 0 6 6 0 0 0 5 5.91V20H9a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2h-2v-2.59A6 6 0 0 0 18 11.5Z"
+                    />
+                  </svg>
+                  <span id="micLabel">Start recording</span>
+                </button>
+              </div>
+              <p
+                id="micStatus"
+                class="status"
+                role="status"
+                aria-live="polite"
+              ></p>
+              <p id="engineNote" class="fine center-text"></p>
+            </div>
+            <p id="notice" class="notice" hidden></p>
+
+            <div id="originalBlock" class="block" hidden>
+              <h3>
+                Original transcript <small>exactly as heard, read-only</small>
+              </h3>
+              <div id="originalBox" class="box"></div>
+            </div>
+
+            <div class="block">
+              <h3>
+                Your message
+                <span id="editedBadge" class="badge" hidden>edited</span>
+              </h3>
+              <textarea
+                id="editBox"
+                rows="4"
+                disabled
+                placeholder="Your words will appear here. You can fix mistakes before translating."
+              ></textarea>
+              <div class="actions">
+                <button id="restoreBtn" type="button" class="btn ghost" hidden>
+                  Restore original
+                </button>
+                <button id="playBtn" type="button" class="btn ghost" disabled>
+                  Listen
+                </button>
+              </div>
+            </div>
+
+            <button
+              id="translateBtn"
+              class="btn primary big"
+              type="button"
+              disabled
+            >
+              Translate
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- PAGE 6: translation in both languages -->
+      <section class="screen" id="screen-result">
+        <div class="card">
+          <div class="card-head"><h2>Here is the translation</h2></div>
+          <div class="card-body">
+            <div class="pair">
+              <article class="say" id="origCard">
+                <span class="cap" id="origCap"></span>
+                <p class="say-text" id="origText"></p>
+                <p class="fine" id="origNote" hidden></p>
+                <button id="playOrigBtn" class="btn ghost" type="button">
+                  Play
+                </button>
+              </article>
+              <div class="arrow" aria-hidden="true">↓</div>
+              <article class="say" id="trCard">
+                <span class="cap" id="trCap"></span>
+                <p class="say-text" id="trText"></p>
+                <button id="playTrBtn" class="btn ghost" type="button">
+                  Play
+                </button>
+              </article>
+            </div>
+            <p id="resultNotice" class="notice" hidden></p>
+            <p class="fine">
+              Machine translation. Please check it before relying on it for
+              medical decisions.
+            </p>
+            <div class="actions">
+              <button id="saveBtn" class="btn primary big" type="button">
+                Save and next turn
+              </button>
+              <button id="editAgainBtn" class="btn ghost big" type="button">
+                Edit again
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- order matters: helpers first, app.js last -->
+    <script src="js/translation.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/recording.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>
