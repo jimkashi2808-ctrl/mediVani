@@ -1,54 +1,215 @@
-# MediVaani
+# MediVaani — Voice-first healthcare communication
 
-Voice-first communication assistant for patients and doctors who speak different Indian languages.
+MediVaani helps a patient and a doctor communicate when they speak different languages. It is designed as a shared-device, turn-by-turn conversation flow: choose each person's language, speak or type, review the transcript, translate, and play the translated message aloud.
 
-## 1. Quick start (works with no keys)
+> **Important:** MediVaani is a prototype, not a medical device or a certified medical interpreter. AI translation and speech recognition can make mistakes. A clinician must confirm diagnoses, medicine names, doses, timings, and other medical instructions before anyone acts on them. Do not use real patient information in a public demo.
 
-1. Install Node.js 18 or newer from https://nodejs.org
-2. In a terminal, open the `backend` folder and run:
-   ```
-   npm install
-   npm start
-   ```
-3. Open **http://localhost:3000** in Chrome or Edge and allow the microphone.
+## Features
 
-Without any setup, speech uses the browser's built-in recognition and translation uses MyMemory (free).
+- Patient and doctor language selection.
+- Voice or text input.
+- Editable transcript before translation.
+- Translation through a local Ollama model.
+- Optional AI4Bharat IndicConformer speech recognition.
+- Text-to-speech using voices available on the user's device.
+- Turn-by-turn conversation flow.
 
-## 2. Add your keys and real engines
+## Technology
 
-Copy `backend/.env.example` to a new file `backend/.env`, then fill it in. `.env` is private and ignored by Git.
+- Frontend: HTML, CSS and vanilla JavaScript.
+- Backend: Node.js and Express.
+- Translation: Ollama or optional MyMemory provider.
+- Optional speech recognition: Python, FastAPI and AI4Bharat IndicConformer.
+- Text-to-speech: Browser Web Speech API.
 
-### Speech to text: AI4Bharat IndicConformer
+Languages shown in the current interface: Hindi, Bengali, Marathi, Telugu, Tamil, Gujarati, Urdu, Kannada and English (India). Actual recognition, translation and voice quality varies by engine and device.
 
-IndicConformer is free and open, but it has no ready-made hosted API, so you run it yourself:
+## Project structure
 
-1. Make a free account at https://huggingface.co, open https://huggingface.co/ai4bharat/indic-conformer-600m-multilingual and accept the conditions.
-2. In Hugging Face settings, create a **read** access token and paste it as `HF_TOKEN` in `backend/.env`.
-3. Install Python 3.10 or newer. In a second terminal:
-   ```
-   cd backend/asr
-   pip install -r requirements.txt
-   python -m uvicorn server:app --port 8001
-   ```
-   The first start downloads the model (large), so wait for "IndicConformer is ready."
-4. Restart `npm start`. The mic page now says "Speech engine: AI4Bharat IndicConformer".
+```text
+mediVani/
+├── frontend/
+│   ├── index.html
+│   ├── css/style.css
+│   └── js/
+│       ├── app.js
+│       ├── recording.js
+│       ├── translation.js
+│       └── audio.js
+├── backend/
+│   ├── server.js
+│   ├── config/
+│   ├── controllers/
+│   ├── routes/
+│   ├── services/
+│   ├── utils/
+│   ├── asr/
+│   ├── package.json
+│   └── .env.example
+├── docs/
+└── README.md
+```
 
-It supports the Indian languages (Hindi, Bengali, Marathi, Telugu, Tamil, Gujarati, Urdu, Kannada). It does **not** support English, so the browser engine is used when the doctor speaks English.
+## Requirements
 
-### Translation: Ollama (local AI, no key)
+- Node.js 18 or newer.
+- Ollama installed locally.
+- A computer with enough memory and disk space for the selected model.
+- Chrome or Edge recommended for testing browser speech features.
 
-1. Install Ollama from https://ollama.com
-2. Run `ollama pull gemma3:4b` (or any model you prefer, then set `OLLAMA_MODEL`)
-3. Keep `TRANSLATION_PROVIDER=ollama` in `backend/.env` and restart `npm start`.
+## Run MediVaani with Ollama
 
-Local models can make mistakes in Indian languages. Always check translations before medical decisions.
+### 1. Install backend dependencies
 
-## Login
+Open a terminal in the project root:
 
-The login page is a name screen only (no password, nothing sent to the server). Ollama is not a login system.
+```bash
+cd backend
+npm install
+```
 
-## Not built yet
+### 2. Create your environment file
 
-Medicine information capture and bilingual consultation summaries.
+Windows PowerShell:
 
-More details: `docs/PROJECT_OVERVIEW.md`, `docs/API_DOCUMENTATION.md`.
+```powershell
+Copy-Item .env.example .env
+```
+
+macOS/Linux:
+
+```bash
+cp .env.example .env
+```
+
+Use these settings in `backend/.env`:
+
+```env
+PORT=3000
+TRANSLATION_PROVIDER=ollama
+OLLAMA_URL=http://localhost:11434
+OLLAMA_MODEL=gemma3:4b
+ASR_SERVICE_URL=
+```
+
+Do not commit or share `backend/.env`. Never put API tokens or credentials in source code, README files, screenshots or GitHub.
+
+### 3. Download the Ollama model
+
+```bash
+ollama pull gemma3:4b
+```
+
+Make sure the Ollama desktop app or service is running. Check installed models with:
+
+```bash
+ollama list
+```
+
+If Ollama is not running, start it in a separate terminal:
+
+```bash
+ollama serve
+```
+
+### 4. Start the backend
+
+From the `backend` folder:
+
+```bash
+npm start
+```
+
+Open the application:
+
+http://localhost:3000
+
+Allow microphone access when your browser asks. You can also use the Write option if speech recognition is unavailable.
+
+### 5. Check backend health
+
+Open:
+
+http://localhost:3000/api/health
+
+Expected response:
+
+```json
+{"status":"ok"}
+```
+
+## Optional: IndicConformer speech recognition
+
+The project includes an optional FastAPI service in `backend/asr/`. Ollama is used for translation; IndicConformer is used for speech-to-text. You do not need IndicConformer to test typed translation or browser speech recognition.
+
+Install Python 3.10/3.11, create a virtual environment inside `backend/asr`, activate it, and install:
+
+```bash
+pip install -r requirements.txt
+```
+
+If the Hugging Face model requires authentication, set `HF_TOKEN` in `backend/.env`. Keep it private.
+
+Start the service from `backend/asr`:
+
+```bash
+uvicorn server:app --host 127.0.0.1 --port 8001
+```
+
+Set this in `backend/.env`:
+
+```env
+ASR_SERVICE_URL=http://localhost:8001
+```
+
+Restart the Node backend. If the optional service is not installed or running, leave `ASR_SERVICE_URL` blank.
+
+## Translation providers
+
+| Provider | Setting | Notes |
+|---|---|---|
+| Ollama | `TRANSLATION_PROVIDER=ollama` | Local model; requires local compute and model storage. |
+| MyMemory | `TRANSLATION_PROVIDER=mymemory` | Internet-based provider; free limits and availability can change. |
+
+Ollama output is not guaranteed to be medically accurate. Test language pairs with safe sample sentences, especially numbers, negation, allergies, duration and dosage units. Always show the original message and require clinician confirmation.
+
+## API endpoints
+
+- `GET /api/health` — backend health.
+- `GET /api/config` — configured translation provider and optional ASR status.
+- `POST /api/translate` — accepts `{ "text": "...", "from": "en", "to": "hi" }` and returns `{ "translatedText": "..." }`.
+- `POST /api/transcribe?lang=hi-IN` — accepts 16 kHz mono 16-bit WAV audio and returns `{ "text": "..." }`. Requires the optional IndicConformer service.
+
+## Push changes to GitHub
+
+Run these commands from the project root, where the `.git` folder exists:
+
+```bash
+git status --short
+git add .
+git status
+git commit -m "Prepare MediVaani voice-first healthcare demo"
+git pull --rebase origin main
+git push origin main
+```
+
+Do not force-push. If Git reports a conflict, resolve it before pushing. Do not delete `.git` or run `git init` in an existing repository.
+
+## Demo checklist
+
+- Start Ollama and confirm the model appears in `ollama list`.
+- Start the backend and check `/api/health`.
+- Test typed translation for the language pairs you plan to demonstrate.
+- Test microphone permission and speech recognition in the actual demo browser.
+- Test text-to-speech voices on the demo device.
+- Show the original transcript alongside the translation.
+- Use fictional sample patient information only.
+- State clearly that the doctor must verify medical instructions.
+
+## Limitations
+
+- Listing a language in the interface does not guarantee equal support across all engines.
+- Browser speech recognition and speech synthesis depend on browser, operating system, installed voices and internet availability.
+- IndicConformer is optional and must be installed separately.
+- Local Ollama translation depends on the model's language ability, computer memory and speed.
+- MediVaani is a hackathon prototype, not a validated clinical translation system.
